@@ -1,0 +1,30 @@
+Specific Changes:
+- Create new dialog for adding todo items:
+  * Add floating action button to open dialog
+  * Include text input field for todo description
+  * Add save and cancel buttons in dialog
+- Implement todo creation functionality:
+  * Connect dialog input to todo list
+  * Clear input field after successful addition
+  * Dismiss dialog on save or cancel
+- Update main todo list:
+  * Refresh list when new item added
+  * Maintain scroll position after addition
+  * Show brief success indicator
+
+Constraints:
+- Dialog must be dismissible by tapping outside
+- Keep input field focused when dialog opens
+- Prevent empty todo items from being added
+- Maintain existing todo list sorting/filtering
+- Ensure dialog works in both portrait and landscape
+
+Expected Output:
+When users tap the add button, a dialog appears with a text input field. After entering text and tapping save, the dialog closes and the new todo item appears in the main list with a subtle animation. The dialog should feel natural and integrated with the existing app design.
+
+Success indicators:
+- New todos appear immediately in the list
+- Dialog closes smoothly after adding item
+- Empty submissions are prevented
+- Input field clears between openings
+- Keyboard appears automatically with dialog
