@@ -1,10 +1,10 @@
+import 'package:stacked/stacked.dart';
+import 'package:todo_app_v5/app/app.locator.dart';
 import 'package:todo_app_v5/features/profile/profile_repository.dart';
 import 'package:todo_app_v5/models/user.dart';
 
 class UserService {
-  final ProfileRepository _repository;
-
-  UserService(this._repository);
+  final _repository = locator<ProfileRepository>();
 
   User? _currentUser;
 
