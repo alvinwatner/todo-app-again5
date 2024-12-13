@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:stacked/stacked.dart';
-
-import 'home_viewmodel.dart';
+import 'package:todo_app_v5/features/home/home_viewmodel.dart';
+import 'package:todo_app_v5/features/home/widgets/todo_item.dart';
+import 'package:todo_app_v5/ui/common/app_colors.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
   const HomeView({Key? key}) : super(key: key);
@@ -13,71 +13,64 @@ class HomeView extends StackedView<HomeViewModel> {
     HomeViewModel viewModel,
     Widget? child,
   ) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Gap(50),
-                Column(
-                  children: [
-                    const Text(
-                      'Hello from STEVE x STACKED!',
-                      style: TextStyle(
-                        fontSize: 35,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const Gap(25),
-                    MaterialButton(
-                      color: Colors.black,
-                      onPressed: viewModel.incrementCounter,
-                      child: Text(
-                        viewModel.counterLabel,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    MaterialButton(
-                      color: Colors.grey,
-                      onPressed: viewModel.showDialog,
-                      child: const Text(
-                        'Show Dialog',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    MaterialButton(
-                      color: Colors.grey,
-                      onPressed: viewModel.showBottomSheet,
-                      child: const Text(
-                        'Show Bottom Sheet',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Todo App'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'All'),
+              Tab(text: 'Active'),
+              Tab(text: 'Completed'),
+            ],
           ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildTodoList(viewModel, null),
+            _buildTodoList(viewModel, false),
+            _buildTodoList(viewModel, true),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: viewModel.addTodo,
+          backgroundColor: kcPrimaryColor,
+          child: const Icon(Icons.add),
         ),
       ),
     );
   }
 
+  Widget _buildTodoList(HomeViewModel viewModel, bool? isCompleted) {
+    final todos = viewModel.getFilteredTodos(isCompleted: isCompleted);
+
+    if (viewModel.isBusy) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (todos.isEmpty) {
+      return const Center(
+        child: Text('No todos found'),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: todos.length,
+      itemBuilder: (context, index) {
+        final todo = todos[index];
+        return TodoItem(
+          todo: todo,
+          onToggle: viewModel.toggleTodoStatus,
+          onDelete: viewModel.deleteTodo,
+        );
+      },
+    );
+  }
+
   @override
-  HomeViewModel viewModelBuilder(
-    BuildContext context,
-  ) =>
-      HomeViewModel();
+  HomeViewModel viewModelBuilder(BuildContext context) => HomeViewModel();
+
+  @override
+  void onViewModelReady(HomeViewModel viewModel) => viewModel.initialize();
 }
