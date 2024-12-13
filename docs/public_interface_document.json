@@ -1,7 +1,7 @@
 {
   "package_name": "com.steve.todo_app_v5",
-  "project_description": "The Flutter project is a Todo application that follows the Stacked architecture. It allows users to create, view, update, and delete todo items. Users can mark todo items as complete, view due dates, and interact with custom dialogs and bottom sheets.",
-  "architecture_overview": "The application is structured using the Stacked architecture, which separates the concerns of the application into distinct layers: UI, View Model, and Service. The UI layer consists of the various views and widgets, the View Model layer handles the business logic and state management, and the Service layer manages dependencies and provides access to external resources. This modular design allows for easy addition of new features, services, and UI components.",
+  "project_description": "The Flutter project is a Todo application that allows users to create, view, update, and delete todo items. Users can mark todo items as complete, view due dates, and interact with custom dialogs and bottom sheets. The application follows the Stacked architecture, which separates the concerns of the application into distinct layers: UI, View Model, and Service.",
+  "architecture_overview": "The Stacked architecture used in this application provides a modular and testable codebase. The UI layer consists of the various views and widgets, the View Model layer handles the business logic and state management, and the Service layer manages dependencies and provides access to external resources. This separation of concerns allows for easy addition of new features, services, and UI components.",
   "files": [
     {
       "name": "lib/app/app.dart",
@@ -752,6 +752,243 @@
         "package:todo_app_v5/ui/common/ui_helpers.dart",
         "package:todo_app_v5/ui/dialogs/add_todo/add_todo_dialog_model.dart"
       ]
+    },
+    {
+      "name": "lib/features/profile/profile_repository.dart",
+      "description": "The ProfileRepository class is responsible for managing the user's profile data, including loading, saving, and deleting the user's information. It serves as an abstraction layer between the application's UI and the underlying data storage, whether it's secure storage or an API.",
+      "class_diagram": "@startuml\nclass ProfileRepository {\n  - User? _user\n  + Future<User?> loadUser()\n  + Future<void> saveUser(User user)\n  + Future<void> deleteUser()\n}\n@enduml",
+      "methods": [
+        {
+          "name": "loadUser",
+          "description": "Loads the user's profile data, either from secure storage or a backend API. If the user data is not available, it creates a default user profile.",
+          "parameters": null,
+          "return_type": "Future<User?>"
+        },
+        {
+          "name": "saveUser",
+          "description": "Saves the user's profile data to secure storage or a backend API.",
+          "parameters": [
+            "User user"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "deleteUser",
+          "description": "Deletes the user's profile data from secure storage or a backend API.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "todo_app_v5/models/user.dart"
+      ]
+    },
+    {
+      "name": "lib/features/home/widgets/profile_avatar.dart",
+      "description": "The ProfileAvatar widget is responsible for rendering a user's profile image or a default avatar icon. It provides a clickable avatar that can be tapped to perform a specific action, such as opening a profile screen.",
+      "class_diagram": "@startuml\nclass ProfileAvatar {\n  -String? imageUrl\n  -VoidCallback onTap\n  +Widget build(BuildContext)\n  -Widget _buildDefaultAvatar()\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Renders the profile avatar, which can be either an image loaded from the provided URL or a default avatar icon.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildDefaultAvatar",
+          "description": "Builds the default avatar icon to be displayed when no image URL is provided.",
+          "parameters": null,
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "flutter/material.dart",
+        "todo_app_v5/ui/common/app_colors.dart",
+        "todo_app_v5/ui/common/ui_helpers.dart"
+      ]
+    },
+    {
+      "name": "lib/features/profile/profile_viewmodel.dart",
+      "description": "The ProfileViewModel class is responsible for managing the user's profile information and interactions within the application. It provides the necessary functionality to display the user's name, email, profile image, and notifications settings, as well as the ability to update the user's profile image and toggle notifications.",
+      "class_diagram": "@startuml\nclass ProfileViewModel {\n  -_userService : UserService\n  -_navigationService : NavigationService\n  +userName : String\n  +userImageUrl : String\n  +userEmail : String\n  +notificationsEnabled : bool\n  +initialize() : Future<void>\n  +navigateBack() : void\n  +updateProfileImage() : Future<void>\n  +toggleNotifications(enabled : bool) : Future<void>\n}\n@enduml",
+      "methods": [
+        {
+          "name": "initialize",
+          "description": "Initializes the user service and retrieves the user's profile information.",
+          "parameters": [],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "navigateBack",
+          "description": "Navigates back to the previous screen.",
+          "parameters": [],
+          "return_type": "void"
+        },
+        {
+          "name": "updateProfileImage",
+          "description": "Allows the user to update their profile image.",
+          "parameters": [],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "toggleNotifications",
+          "description": "Toggles the user's notification settings and updates the user profile accordingly.",
+          "parameters": [
+            "enabled : bool"
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "stacked/stacked.dart",
+        "stacked_services/stacked_services.dart",
+        "todo_app_v5/app/app.locator.dart",
+        "todo_app_v5/models/user.dart",
+        "todo_app_v5/services/user_service.dart"
+      ]
+    },
+    {
+      "name": "lib/features/profile/profile_view.dart",
+      "description": "The ProfileView class is responsible for rendering the user's profile screen in the Todo App. It displays the user's profile image, name, email, and notification settings, and provides functionality to update the profile image and toggle notification preferences.",
+      "class_diagram": "@startuml\nclass ProfileView {\n  -_buildProfileImage(ProfileViewModel viewModel): Widget\n  -_buildDefaultProfileImage(): Widget\n  -_buildProfileInfo(ProfileViewModel viewModel): Widget\n  +builder(BuildContext context, ProfileViewModel viewModel, Widget? child): Widget\n  +viewModelBuilder(BuildContext context): ProfileViewModel\n  +onViewModelReady(ProfileViewModel viewModel): void\n}\n\nclass ProfileViewModel {\n  +userName: String\n  +userEmail: String\n  +userImageUrl: String?\n  +notificationsEnabled: bool\n  +isBusy: bool\n  +initialize(): void\n  +updateProfileImage(): void\n  +toggleNotifications(bool value): void\n  +navigateBack(): void\n}\n\nProfileView --> ProfileViewModel\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the UI for the ProfileView, including the app bar, profile image, user name, and profile information.",
+          "parameters": [
+            "BuildContext context",
+            "ProfileViewModel viewModel",
+            "Widget? child"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildProfileImage",
+          "description": "Builds the profile image UI, which includes the user's profile image and a button to update the image.",
+          "parameters": [
+            "ProfileViewModel viewModel"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildDefaultProfileImage",
+          "description": "Builds the default profile image UI when the user's profile image is not available.",
+          "parameters": [],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildProfileInfo",
+          "description": "Builds the profile information UI, which includes the user's email and notification settings.",
+          "parameters": [
+            "ProfileViewModel viewModel"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides an instance of the ProfileViewModel to the ProfileView.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "ProfileViewModel"
+        },
+        {
+          "name": "onViewModelReady",
+          "description": "Initializes the ProfileViewModel when the ProfileView is ready.",
+          "parameters": [
+            "ProfileViewModel viewModel"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:todo_app_v5/features/profile/profile_viewmodel.dart",
+        "package:todo_app_v5/ui/common/app_colors.dart",
+        "package:todo_app_v5/ui/common/ui_helpers.dart"
+      ]
+    },
+    {
+      "name": "lib/models/user.dart",
+      "description": "This Dart file defines the `User` class, which represents a user in the application. It encapsulates the core user data and provides utility methods for working with user information.",
+      "class_diagram": "@startuml\nclass User {\n  +final String id\n  +final String name\n  +final String email\n  +final String? imageUrl\n  +final bool notificationsEnabled\n  +User copyWith()\n  +Map<String, dynamic> toJson()\n  +factory User.fromJson(Map<String, dynamic> json)\n  +List<Object?> get props\n}\n@enduml",
+      "methods": [
+        {
+          "name": "copyWith",
+          "description": "Creates a new `User` instance with the specified changes to the existing properties.",
+          "parameters": [
+            "String? id",
+            "String? name",
+            "String? email",
+            "String? imageUrl",
+            "bool? notificationsEnabled"
+          ],
+          "return_type": "User"
+        },
+        {
+          "name": "toJson",
+          "description": "Converts the `User` instance to a JSON map.",
+          "parameters": null,
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "fromJson",
+          "description": "Creates a `User` instance from a JSON map.",
+          "parameters": [
+            "Map<String, dynamic> json"
+          ],
+          "return_type": "User"
+        },
+        {
+          "name": "props",
+          "description": "Returns a list of all the properties of the `User` instance, used for equality comparison.",
+          "parameters": null,
+          "return_type": "List<Object?>"
+        }
+      ],
+      "dependencies": [
+        "equatable"
+      ]
+    },
+    {
+      "name": "lib/services/user_service.dart",
+      "description": "The UserService class is responsible for managing the current user's data and providing access to user-related functionality within the application. It serves as the central hub for user-centric operations, handling tasks such as loading, updating, and clearing the user's profile information.",
+      "class_diagram": "@startuml\nclass UserService {\n  - _repository: ProfileRepository\n  - _currentUser: User\n  + currentUser: User\n  + initialize(): Future<void>\n  + updateUser(user: User): Future<void>\n  + clearUser(): Future<void>\n  + hasUser: bool\n  + userImageUrl: String\n  + userName: String\n}\n\nclass ProfileRepository {\n  + loadUser(): Future<User>\n  + saveUser(user: User): Future<void>\n  + deleteUser(): Future<void>\n}\n\nUserService --> ProfileRepository\n@enduml",
+      "methods": [
+        {
+          "name": "initialize",
+          "description": "Loads the current user's profile data from the ProfileRepository and stores it in the _currentUser field.",
+          "parameters": [
+            ""
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "updateUser",
+          "description": "Updates the current user's profile data by saving the new user object to the ProfileRepository and updating the _currentUser field.",
+          "parameters": [
+            "user: User"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "clearUser",
+          "description": "Deletes the current user's profile data from the ProfileRepository and sets the _currentUser field to null.",
+          "parameters": [
+            ""
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart",
+        "package:todo_app_v5/app/app.locator.dart",
+        "package:todo_app_v5/features/profile/profile_repository.dart",
+        "package:todo_app_v5/models/user.dart"
+      ]
     }
   ],
   "dependencies": [
@@ -777,6 +1014,6 @@
     }
   ],
   "sequence_diagram": "@startuml\nactor User\nparticipant AppView\nparticipant StartupView\nparticipant StartupViewModel\nparticipant HomeView\nparticipant HomeViewModel\nparticipant TodoService\nparticipant HomeRepository\nparticipant BottomSheetService\nparticipant DialogService\n\nUser -> AppView: Launch app\nAppView -> StartupView: Initialize\nStartupView -> StartupViewModel: Run startup logic\nStartupViewModel -> TodoService: Load todos\nTodoService -> HomeRepository: Load todos\nHomeRepository -> StartupViewModel: Return todos\nStartupViewModel -> HomeView: Navigate to home view\nHomeView -> HomeViewModel: Initialize\nHomeViewModel -> TodoService: Load todos\nTodoService -> HomeRepository: Load todos\nHomeRepository -> HomeViewModel: Return todos\nHomeViewModel -> HomeView: Update UI\n\nUser -> HomeView: Interact (add, toggle, delete todo)\nHomeView -> HomeViewModel: Handle user actions\nHomeViewModel -> TodoService: Add/Toggle/Delete todo\nTodoService -> HomeRepository: Add/Update/Delete todo\nHomeRepository -> TodoService: Return updated todos\nTodoService -> HomeViewModel: Return updated todos\nHomeViewModel -> HomeView: Update UI\n\nUser -> HomeView: Show dialog\nHomeView -> HomeViewModel: Request dialog\nHomeViewModel -> DialogService: Show dialog\nDialogService -> HomeViewModel: Return dialog response\nHomeViewModel -> HomeView: Update UI\n\nUser -> HomeView: Show bottom sheet\nHomeView -> HomeViewModel: Request bottom sheet\nHomeViewModel -> BottomSheetService: Show bottom sheet\nBottomSheetService -> HomeViewModel: Return bottom sheet response\nHomeViewModel -> HomeView: Update UI\n@enduml",
-  "state_management_flow": "The application uses the Stacked architecture for state management. The ViewModels (e.g., HomeViewModel, StartupViewModel) handle the business logic and state for their respective views. The ViewModels interact with the TodoService and HomeRepository to manage the todo items. The ViewModels also use the DialogService and BottomSheetService to handle the display and interactions of custom dialogs and bottom sheets. This separation of concerns allows for a modular and testable codebase.",
+  "state_management_flow": "The application uses the Stacked architecture for state management, with the ViewModels (e.g., HomeViewModel, StartupViewModel) handling the business logic and state for their respective views. The ViewModels interact with the TodoService and HomeRepository to manage the todo items. They also use the DialogService and BottomSheetService to handle the display and interactions of custom dialogs and bottom sheets. This separation of concerns allows for a modular and testable codebase.",
   "navigation_flow": "The application's navigation is managed using the Stacked Router, defined in the app.router.dart file. This file sets up the available routes (HomeView and StartupView) and provides utility methods to navigate between them. The main.dart file sets up the app and runs the AppView, which initializes the Stacked architecture and displays the StartupView. After the startup logic is completed, the StartupViewModel navigates to the HomeView. User interactions within the HomeView, such as opening dialogs or bottom sheets, are handled by the HomeViewModel, which requests the necessary services to display the UI components."
 }
