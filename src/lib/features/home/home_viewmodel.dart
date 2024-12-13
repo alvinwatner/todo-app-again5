@@ -3,17 +3,25 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:todo_app_v5/app/app.bottomsheets.dart';
 import 'package:todo_app_v5/app/app.dialogs.dart';
 import 'package:todo_app_v5/app/app.locator.dart';
+import 'package:todo_app_v5/app/app.router.dart';
 import 'package:todo_app_v5/models/todo.dart';
 import 'package:todo_app_v5/services/todo_service.dart';
+import 'package:todo_app_v5/services/user_service.dart';
 
 class HomeViewModel extends BaseViewModel {
   final _todoService = locator<TodoService>();
   final _dialogService = locator<DialogService>();
+  final _navigationService = locator<NavigationService>();
+  final _userService = locator<UserService>();
 
   List<Todo> get todos => _todoService.todos;
+  String? get userImageUrl => _userService.userImageUrl;
 
   Future<void> initialize() async {
-    await runBusyFuture(_todoService.loadTodos());
+    await runBusyFuture(Future.wait([
+      _todoService.loadTodos(),
+      _userService.initialize(),
+    ]));
   }
 
   Future<void> showAddTodoDialog() async {
@@ -51,5 +59,9 @@ class HomeViewModel extends BaseViewModel {
   List<Todo> getFilteredTodos({bool? isCompleted}) {
     if (isCompleted == null) return todos;
     return todos.where((todo) => todo.isCompleted == isCompleted).toList();
+  }
+
+  Future<void> navigateToProfile() async {
+    await _navigationService.navigateTo(Routes.profileView);
   }
 }

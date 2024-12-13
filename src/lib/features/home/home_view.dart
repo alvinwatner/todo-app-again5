@@ -3,6 +3,7 @@ import 'package:stacked/stacked.dart';
 import 'package:gap/gap.dart';
 import 'package:todo_app_v5/features/home/home_viewmodel.dart';
 import 'package:todo_app_v5/features/home/widgets/todo_item.dart';
+import 'package:todo_app_v5/features/home/widgets/profile_avatar.dart';
 import 'package:todo_app_v5/ui/common/app_colors.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
@@ -19,6 +20,15 @@ class HomeView extends StackedView<HomeViewModel> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Todo App'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: ProfileAvatar(
+                imageUrl: viewModel.userImageUrl,
+                onTap: viewModel.navigateToProfile,
+              ),
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'All'),
