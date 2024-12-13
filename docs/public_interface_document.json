@@ -1,7 +1,7 @@
 {
   "package_name": "com.steve.todo_app_v5",
-  "project_description": "The Flutter project is a Todo application that follows the Stacked architecture. It features routing, dependency injection, dialog management, and bottom sheet management. The application allows users to create, view, update, and delete todo items. It also provides functionality to mark todo items as complete, view due dates, and interact with custom dialogs and bottom sheets.",
-  "architecture_overview": "The application is structured using the Stacked architecture, which separates the concerns of the application into distinct layers: UI, View Model, and Service. The UI layer consists of the various views and widgets, the View Model layer handles the business logic and state management, and the Service layer manages dependencies and provides access to external resources. The app.dart file sets up the application structure, including routes, dependencies, bottom sheets, and dialogs. This modular design allows for easy addition of new features, services, and UI components.",
+  "project_description": "The Flutter project is a Todo application that follows the Stacked architecture. It allows users to create, view, update, and delete todo items. Users can mark todo items as complete, view due dates, and interact with custom dialogs and bottom sheets.",
+  "architecture_overview": "The application is structured using the Stacked architecture, which separates the concerns of the application into distinct layers: UI, View Model, and Service. The UI layer consists of the various views and widgets, the View Model layer handles the business logic and state management, and the Service layer manages dependencies and provides access to external resources. This modular design allows for easy addition of new features, services, and UI components.",
   "files": [
     {
       "name": "lib/app/app.dart",
@@ -674,6 +674,84 @@
       "class_diagram": "@startuml\nclass Auto\n@enduml",
       "methods": [],
       "dependencies": []
+    },
+    {
+      "name": "lib/ui/dialogs/add_todo/add_todo_dialog_model.dart",
+      "description": "This Dart file defines the AddTodoDialogModel class, which is responsible for managing the state and logic of the 'Add Todo' dialog in the todo app. The main purpose of this class is to provide a way for users to create new todo items and save them to the application's data store.",
+      "class_diagram": "@startuml\nclass AddTodoDialogModel {\n  +GlobalKey<FormState> formKey\n  +TextEditingController titleController\n  +TextEditingController descriptionController\n  +void dispose()\n  +void saveTodo(Function(DialogResponse) completer)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "dispose",
+          "description": "Disposes of the TextEditingController instances to free up system resources.",
+          "parameters": null,
+          "return_type": "void"
+        },
+        {
+          "name": "saveTodo",
+          "description": "Validates the form data, creates a new Todo object, and calls the provided completer function with the new Todo as the response data.",
+          "parameters": [
+            "Function(DialogResponse) completer"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "flutter/material.dart",
+        "stacked/stacked.dart",
+        "stacked_services/stacked_services.dart",
+        "todo_app_v5/models/todo.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/dialogs/add_todo/add_todo_dialog.dart",
+      "description": "This Dart file contains the `AddTodoDialog` class, which is responsible for creating a dialog UI for adding a new todo item to a todo list application. It provides the core functionality for managing the creation of new todo items, including validating the input, saving the new todo, and handling the dialog's lifecycle.",
+      "class_diagram": "@startuml\nclass AddTodoDialog extends StackedView<AddTodoDialogModel> {\n  + AddTodoDialog({required this.request, required this.completer})\n  + Widget builder(BuildContext, AddTodoDialogModel, Widget?)\n  + AddTodoDialogModel viewModelBuilder(BuildContext)\n}\n\nclass AddTodoDialogModel {\n  + final formKey = GlobalKey<FormState>()\n  + final titleController = TextEditingController()\n  + final descriptionController = TextEditingController()\n  + saveTodo(Function(DialogResponse) completer)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "AddTodoDialog",
+          "description": "Constructs an `AddTodoDialog` with the provided `DialogRequest` and `completer` callback.",
+          "parameters": [
+            "required DialogRequest request",
+            "required Function(DialogResponse) completer"
+          ],
+          "return_type": null
+        },
+        {
+          "name": "builder",
+          "description": "Builds the UI for the `AddTodoDialog`, including the form fields and buttons for saving or cancelling the new todo.",
+          "parameters": [
+            "BuildContext context",
+            "AddTodoDialogModel viewModel",
+            "Widget? child"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides an instance of `AddTodoDialogModel` to be used by the `StackedView`.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "AddTodoDialogModel"
+        },
+        {
+          "name": "saveTodo",
+          "description": "Validates the form input and, if valid, saves the new todo and completes the dialog with a `DialogResponse`.",
+          "parameters": [
+            "Function(DialogResponse) completer"
+          ],
+          "return_type": null
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:stacked_services/stacked_services.dart",
+        "package:todo_app_v5/models/todo.dart",
+        "package:todo_app_v5/ui/common/app_colors.dart",
+        "package:todo_app_v5/ui/common/ui_helpers.dart",
+        "package:todo_app_v5/ui/dialogs/add_todo/add_todo_dialog_model.dart"
+      ]
     }
   ],
   "dependencies": [

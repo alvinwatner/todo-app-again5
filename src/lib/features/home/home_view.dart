@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:gap/gap.dart';
 import 'package:todo_app_v5/features/home/home_viewmodel.dart';
 import 'package:todo_app_v5/features/home/widgets/todo_item.dart';
 import 'package:todo_app_v5/ui/common/app_colors.dart';
@@ -34,7 +35,7 @@ class HomeView extends StackedView<HomeViewModel> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: viewModel.addTodo,
+          onPressed: viewModel.showAddTodoDialog,
           backgroundColor: kcPrimaryColor,
           child: const Icon(Icons.add),
         ),
@@ -56,10 +57,12 @@ class HomeView extends StackedView<HomeViewModel> {
     }
 
     return ListView.builder(
+      key: PageStorageKey(isCompleted?.toString() ?? 'all'),
       itemCount: todos.length,
       itemBuilder: (context, index) {
         final todo = todos[index];
         return TodoItem(
+          key: Key(todo.id),
           todo: todo,
           onToggle: viewModel.toggleTodoStatus,
           onDelete: viewModel.deleteTodo,

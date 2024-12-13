@@ -9,7 +9,6 @@ import 'package:todo_app_v5/services/todo_service.dart';
 class HomeViewModel extends BaseViewModel {
   final _todoService = locator<TodoService>();
   final _dialogService = locator<DialogService>();
-  final _bottomSheetService = locator<BottomSheetService>();
 
   List<Todo> get todos => _todoService.todos;
 
@@ -17,15 +16,15 @@ class HomeViewModel extends BaseViewModel {
     await runBusyFuture(_todoService.loadTodos());
   }
 
-  Future<void> addTodo() async {
-    final result = await _bottomSheetService.showCustomSheet(
-      variant: BottomSheetType.notice,
-      title: 'Add Todo',
-      description: 'Add a new todo item',
+  Future<void> showAddTodoDialog() async {
+    final response = await _dialogService.showCustomDialog(
+      variant: DialogType.addTodo,
+      barrierDismissible: true,
     );
 
-    if (result?.confirmed ?? false) {
-      await _todoService.addTodo(result?.data as Todo);
+    if (response?.confirmed == true && response?.data != null) {
+      final todo = response!.data as Todo;
+      await _todoService.addTodo(todo);
       rebuildUi();
     }
   }
@@ -36,10 +35,11 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> deleteTodo(String todoId) async {
-    final response = await _dialogService.showCustomDialog(
-      variant: DialogType.infoAlert,
+    final response = await _dialogService.showDialog(
       title: 'Delete Todo',
       description: 'Are you sure you want to delete this todo?',
+      buttonTitle: 'Delete',
+      cancelTitle: 'Cancel',
     );
 
     if (response?.confirmed ?? false) {
